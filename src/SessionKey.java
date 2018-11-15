@@ -1,33 +1,49 @@
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class SessionKey {
-    private int keyLength;
-    private String encodedKey;
-    private String secretKey;
+    private SecretKey secretKey;
 
     SessionKey (Integer keyLength) {
-        this.keyLength = keyLength;
         createSecretKey(keyLength);
     }
 
     SessionKey (String encodedKey) {
-        this.encodedKey = encodedKey;
         decodeKey(encodedKey);
     }
 
-    public String getSecretKey() {
+    public SecretKey getSecretKey() {
         return secretKey;
     }
 
-    public void encodeKey() {
-
+    public String encodeKey() {
+        String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
+        System.out.println(encodedKey);
+        return encodedKey;
     }
 
     private void createSecretKey(Integer keyLength) {
+        KeyGenerator keyGenerator = null;
+
+        try {
+            keyGenerator = KeyGenerator.getInstance("AES");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        keyGenerator.init(keyLength);
+
+        secretKey = keyGenerator.generateKey();
+        System.out.println("ENCODE LENGTH " + secretKey.getEncoded().length);
 
     }
 
     private void decodeKey(String encodedKey) {
-
+        byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+        System.out.println("DECODED LENGTH " + decodedKey.length);
+        secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
     }
 }
