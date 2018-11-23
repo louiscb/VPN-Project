@@ -1,6 +1,7 @@
 public class VPN {
     public static void main(String[] args) {
         testSessionKey();
+        testSessionCrypto();
     }
 
     private static void testSessionKey() {
@@ -12,6 +13,16 @@ public class VPN {
         }
         else {
             System.out.println("The keys do not match");
+        }
+    }
+
+    private static void testSessionCrypto() {
+        TestSessionCrypto testSessionCrypto = new TestSessionCrypto();
+
+        try {
+            testSessionCrypto.run();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
