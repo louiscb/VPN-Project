@@ -1,6 +1,10 @@
 public class VPN {
     public static void main(String[] args) {
-        testSessionKey();
+        test();
+    }
+
+    private static void test() {
+        //testSessionKey();
         testSessionCrypto();
     }
 
