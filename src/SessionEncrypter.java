@@ -2,7 +2,6 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -19,12 +18,7 @@ public class SessionEncrypter {
         return sessionKey.encodeKey();
     }
 
-    String encodeIV() {
-        String returnIV = Base64.getEncoder().encodeToString(iv);
-        System.out.println("HERE");
-        System.out.println(returnIV.length());
-        return returnIV;
-    }
+    String encodeIV() { return Base64.getEncoder().encodeToString(iv); }
 
     CipherOutputStream openCipherOutputStream(OutputStream output) {
         try {
@@ -34,7 +28,7 @@ public class SessionEncrypter {
             SecureRandom randomSecureRandom = new SecureRandom();
             iv = new byte[cipher.getBlockSize()];
             randomSecureRandom.nextBytes(iv);
-            System.out.println(new String(iv, "UTF-8"));
+            //System.out.println(new String(iv, "UTF-8"));
             ivParameterSpec = new IvParameterSpec(iv);
 
             cipher.init(Cipher.ENCRYPT_MODE, sessionKey.getSecretKey(), ivParameterSpec);
@@ -42,6 +36,7 @@ public class SessionEncrypter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
- }
+}
