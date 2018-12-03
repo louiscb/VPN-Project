@@ -10,7 +10,10 @@ public class VPN {
     }
 
     private static void testVerifyCertificate() {
-        VerifyCertificate vC = new VerifyCertificate("certs/CA", null);
+        VerifyCertificate vC = new VerifyCertificate("certs/CA.pem", "certs/user.pem");
+        //vC.printCACertDN();
+        //vC.printUserCertDN();
+        vC.verify();
     }
 
     private static void testSessionKey() {
@@ -19,8 +22,7 @@ public class VPN {
 
         if (key1.getSecretKey().equals(key2.getSecretKey())) {
             System.out.println("The keys match");
-        }
-        else {
+        } else {
             System.out.println("The keys do not match");
         }
     }

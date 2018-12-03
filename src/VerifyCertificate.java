@@ -1,29 +1,14 @@
 /*
-Class that checks x509 openSSL certificates
 
-Should accept two parameters.
-
-The first parameter is the file with the CA certificate, and the second parameter is the file with the user certificate. When you run your program, it should do the following:
-
-Print the DN for the CA (one line)
-Print the DN for the user (one line)
-Verify the CA certificate
-Verify the user certificate
-Print "Pass" if check 3 and 4 are successful
-Print "Fail" if any of them fails, followed by an explanatory comment of how the verification failed
  */
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 
 public class VerifyCertificate {
-    X509Certificate CACert;
-    X509Certificate userCert;
+    private X509Certificate CACert;
+    private X509Certificate userCert;
 
     VerifyCertificate (String CACertPath, String userCertPath) {
         try {
@@ -35,12 +20,70 @@ public class VerifyCertificate {
             FileInputStream userIs = new FileInputStream(userCertPath);
             userCert = (X509Certificate) fact.generateCertificate(userIs);
 
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
+        } catch (CertificateException | FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    
+    public void printCACertDN () {
+        System.out.println("Here is the CA's DN");
+        System.out.println(CACert.getSubjectDN());
+        System.out.println(CACert.getIssuerDN());
+    }
+
+    public void printUserCertDN () {
+        System.out.println("Here is the User's DN");
+        System.out.println(userCert.getSubjectDN());
+        System.out.println(userCert.getIssuerDN());
+    }
+
+    public void verify() {
+        if (isCAVerified() && isUserVerified()) {
+            System.out.println("\nPASS");
+        } else {
+            System.out.println("\nFAIL");
+        }
+    }
+
+    private boolean isCAVerified() {
+        System.out.println("\nVerifying CA's certificate:");
+
+        if (!isDateValid(CACert))
+            return false;
+
+        //Do I need to check that the CA is self verified?
+
+        return true;
+    }
+
+    private boolean isUserVerified() {
+        System.out.println("\nVerifying user's certificate:");
+
+        if (!isDateValid(CACert))
+            return false;
+
+        //Verifies that user certificate was signed using the private key
+        //that corresponds to the CA's public key
+        try {
+            userCert.verify(CACert.getPublicKey());
+            System.out.println("-> User certificate is signed by CA");
+        } catch (Exception e) {
+            System.out.println("ERROR: User certificate not signed by CA");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isDateValid(X509Certificate certificate) {
+        //checking date & expiration of cert
+        try {
+            certificate.checkValidity();
+            System.out.println("-> The certificate has not expired & is valid");
+            return true;
+        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+            System.out.println("ERROR: Certificate's dates are not valid");
+            return false;
+        }
+    }
 }
