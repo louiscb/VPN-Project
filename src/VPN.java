@@ -5,7 +5,12 @@ public class VPN {
 
     private static void test() {
         //testSessionKey();
-        testSessionCrypto();
+        //testSessionCrypto();
+        testVerifyCertificate();
+    }
+
+    private static void testVerifyCertificate() {
+        VerifyCertificate vC = new VerifyCertificate("certs/CA", null);
     }
 
     private static void testSessionKey() {
