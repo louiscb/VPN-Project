@@ -28,10 +28,16 @@ public class SessionEncrypter {
             SecureRandom randomSecureRandom = new SecureRandom();
             iv = new byte[cipher.getBlockSize()];
             randomSecureRandom.nextBytes(iv);
+
+//            for (byte i: iv) {
+//                System.out.println(i);
+//            }
+
             //System.out.println(new String(iv, "UTF-8"));
             ivParameterSpec = new IvParameterSpec(iv);
 
             cipher.init(Cipher.ENCRYPT_MODE, sessionKey.getSecretKey(), ivParameterSpec);
+
             return new CipherOutputStream(output,cipher);
         } catch (Exception e) {
             e.printStackTrace();
