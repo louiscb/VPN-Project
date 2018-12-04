@@ -1,7 +1,3 @@
-/*
-
- */
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.security.cert.*;
@@ -28,13 +24,11 @@ public class VerifyCertificate {
     public void printCACertDN () {
         System.out.println("Here is the CA's DN");
         System.out.println(CACert.getSubjectDN());
-        System.out.println(CACert.getIssuerDN());
     }
 
     public void printUserCertDN () {
         System.out.println("Here is the User's DN");
         System.out.println(userCert.getSubjectDN());
-        System.out.println(userCert.getIssuerDN());
     }
 
     public void verify() {
