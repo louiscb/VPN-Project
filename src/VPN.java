@@ -6,13 +6,12 @@ public class VPN {
     private static void test() {
         //testSessionKey();
         //testSessionCrypto();
-        testVerifyCertificate();
+        //testVerifyCertificate();
+        testHandshakeCrypto();
     }
 
     private static void testVerifyCertificate() {
         VerifyCertificate vC = new VerifyCertificate("certs/CA.pem", "certs/user.pem");
-        //vC.printCACertDN();
-        //vC.printUserCertDN();
         vC.verify();
     }
 
@@ -35,5 +34,14 @@ public class VPN {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void testHandshakeCrypto() {
+        try {
+            HandshakeCryptoTester.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
