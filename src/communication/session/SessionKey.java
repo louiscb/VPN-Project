@@ -1,3 +1,5 @@
+package communication.session;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -7,11 +9,11 @@ import java.util.Base64;
 public class SessionKey {
     private SecretKey secretKey;
 
-    SessionKey (Integer keyLength) {
+    public SessionKey(Integer keyLength) {
         createSecretKey(keyLength);
     }
 
-    SessionKey (String encodedKey) {
+    public SessionKey (String encodedKey) {
         decodeKey(encodedKey);
     }
 

@@ -1,3 +1,8 @@
+package meta.tests;
+
+import communication.session.SessionDecrypter;
+import communication.session.SessionEncrypter;
+
 import java.io.*;
 import javax.crypto.*;
 

@@ -1,12 +1,27 @@
-public class VPN {
+package meta.tests;
+
+import communication.handshake.VerifyCertificate;
+import communication.session.SessionKey;
+
+public class VPNTester {
     public static void main(String[] args) {
         test();
     }
 
     private static void test() {
-        //testSessionKey();
-        //testSessionCrypto();
-        //testVerifyCertificate();
+        System.out.println(" - Test 1: - ");
+        testSessionKey();
+        System.out.println();
+
+        System.out.println(" - Test 2: - ");
+        testSessionCrypto();
+        System.out.println();
+
+        System.out.println(" - Test 3: - ");
+        testVerifyCertificate();
+        System.out.println();
+
+        System.out.println(" - Test 4: - ");
         testHandshakeCrypto();
     }
 

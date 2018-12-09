@@ -1,4 +1,4 @@
-# VPN Project
+# meta.tests.VPNTester Project
 
 Virtual Private Network software built using Java using OpenSSL.
 

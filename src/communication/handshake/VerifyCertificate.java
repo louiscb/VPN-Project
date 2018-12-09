@@ -1,3 +1,5 @@
+package communication.handshake;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.security.cert.*;
@@ -6,7 +8,7 @@ public class VerifyCertificate {
     private X509Certificate CACert;
     private X509Certificate userCert;
 
-    VerifyCertificate (String CACertPath, String userCertPath) {
+    public VerifyCertificate (String CACertPath, String userCertPath) {
         try {
             CertificateFactory fact = CertificateFactory.getInstance("X.509");
 

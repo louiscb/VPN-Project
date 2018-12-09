@@ -1,3 +1,7 @@
+package meta.tests;
+
+import communication.handshake.HandshakeCrypto;
+
 import java.security.*;
 
 public class HandshakeCryptoTester {
