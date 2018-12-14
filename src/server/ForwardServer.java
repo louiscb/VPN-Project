@@ -15,22 +15,21 @@ package server; /**
  
 import communication.handshake.Handshake;
 import communication.handshake.HandshakeMessage;
-import communication.handshake.VerifyCertificate;
-import communication.session.SessionEncrypter;
+import communication.handshake.aCertificate;
+import communication.session.IV;
 import communication.session.SessionKey;
 import meta.Arguments;
 import meta.Common;
 import meta.Logger;
 import communication.threads.ForwardServerClientThread;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import java.lang.Integer;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.io.IOException;
+import java.security.cert.Certificate;
 
 public class ForwardServer
 {
@@ -45,6 +44,9 @@ public class ForwardServer
     private ServerSocket listenSocket;
     private String targetHost;
     private int targetPort;
+
+    SessionKey sessionKey;
+    IV iv;
 
     /**
      * Program entry point. Reads settings, starts check-alive thread and
@@ -87,6 +89,7 @@ public class ForwardServer
                doHandshake();
                setUpSession();
                 //This creates communication channel between server and target
+                //pass in session key and iv to forward server
                forwardThread = new ForwardServerClientThread(this.listenSocket, this.targetHost, this.targetPort);
                forwardThread.start();
            } catch (IOException e) {
@@ -114,15 +117,15 @@ public class ForwardServer
         clientHello.recv(clientSocket);
 
         if (!clientHello.getParameter("MessageType").equals("ClientHello")) {
-            System.out.println("Received invalid handshake type!");
+            System.err.println("Received invalid handshake type!");
             clientSocket.close();
             throw new Error();
         }
 
         String clientCert = clientHello.getParameter("Certificate");
-        VerifyCertificate verifyCertificate = new VerifyCertificate("CaCertPath.pem", clientCert);
+        aCertificate aCertificate = new aCertificate("CaCertPath.pem", clientCert);
 
-        if (!verifyCertificate.isUserVerified()) {
+        if (!aCertificate.isUserVerified()) {
             clientSocket.close();
             throw new Error();
         }
@@ -139,7 +142,7 @@ public class ForwardServer
         forwardMessage.recv(clientSocket);
 
         if (!clientHello.getParameter(Common.MESSAGE_TYPE).equals(Common.FORWARD_MSG)) {
-            System.out.println("Received invalid message type! Shoud be forward message");
+            System.err.println("Received invalid message type! Shoud be forward message");
             clientSocket.close();
             throw new Error();
         }
@@ -147,18 +150,17 @@ public class ForwardServer
         Handshake.setTargetHost(forwardMessage.getParameter(Common.TARGET_HOST));
         Handshake.setTargetPort(Integer.parseInt(forwardMessage.getParameter(Common.TARGET_PORT)));
 
-        SessionEncrypter sessionEncrypter = new SessionEncrypter();
-        sessionEncrypter.createSessionKey(Common.KEY_LENGTH);
-        sessionEncrypter.createIV();
+        sessionKey = new SessionKey(Common.KEY_LENGTH);
+        iv = new IV();
 
-        final String secretKey = sessionEncrypter.encodeKey();
-        final String iv = sessionEncrypter.encodeIV();
+        final String secretKey = sessionKey.encodeKey();
+        final String ivString = iv.encodeIV();
 
         // encrypt secretKey and IV with client's public key
-
-
-        // create a message, caled session message
+        // create a message, called session message
         // send to client
+
+
 
         clientSocket.close(); //end of handshake
     }

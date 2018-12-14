@@ -1,13 +1,13 @@
 package meta.tests;
 
-import communication.handshake.VerifyCertificate;
+import communication.handshake.aCertificate;
 import communication.session.SessionKey;
 
 public class VPNTester {
     public static void main(String[] args) {
-        test();
+        /*test();*/
     }
-
+/*
     private static void test() {
         System.out.println(" - Test 1: - ");
         testSessionKey();
@@ -26,7 +26,7 @@ public class VPNTester {
     }
 
     private static void testVerifyCertificate() {
-        VerifyCertificate vC = new VerifyCertificate("certs/CA.pem", "certs/user.pem");
+        aCertificate vC = new aCertificate("certs/CA.pem", "certs/user.pem");
         vC.verify();
     }
 
@@ -58,5 +58,5 @@ public class VPNTester {
             e.printStackTrace();
         }
 
-    }
+    }*/
 }

@@ -16,7 +16,7 @@ package client; /**
 
 import communication.handshake.Handshake;
 import communication.handshake.HandshakeMessage;
-import communication.handshake.VerifyCertificate;
+import communication.handshake.aCertificate;
 import meta.Arguments;
 import communication.threads.ForwardServerClientThread;
 
@@ -94,9 +94,10 @@ public class ForwardClient {
         //Step 4 verifies serveHello
 
         String serverCert = serverHello.getParameter("Certificate");
-        VerifyCertificate verifyCertificate = new VerifyCertificate("CaCertPath.pem", serverCert);
+        // PROBLEM
+        aCertificate aCertificate = new aCertificate("CaCertPath.pem", serverCert);
 
-        if (!verifyCertificate.isUserVerified()) {
+        if (!aCertificate.isUserVerified()) {
             socket.close();
             throw new Error();
         }

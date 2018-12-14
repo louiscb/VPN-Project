@@ -14,7 +14,7 @@ public class TestSessionCrypto  {
 
     public void run() throws Exception {
         int b;
-
+/*
         // Create encrypter instance for a given key length
         SessionEncrypter sessionEncrypter = new SessionEncrypter(KEYLENGTH);
 
@@ -44,7 +44,7 @@ public class TestSessionCrypto  {
                 plainOut.write(b);
             }
         }
-
+*/
         System.out.format("Encryption and decryption done. Check that \"%s\" and \"%s\" are identical!\n", PLAININPUT, PLAINOUTPUT);
     }
 }

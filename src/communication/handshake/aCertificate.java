@@ -1,27 +1,19 @@
 package communication.handshake;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.security.cert.*;
 
-public class VerifyCertificate {
+public class aCertificate {
     private X509Certificate CACert;
+    private X509Certificate ourCert;
     private X509Certificate userCert;
 
     //Change userCertPath to string
-    public VerifyCertificate (String CACertPath, String userCertPath) {
-        try {
-            CertificateFactory fact = CertificateFactory.getInstance("X.509");
+    public aCertificate(String CACertPath, String ourCert) throws Exception {
+        CertificateFactory fact = CertificateFactory.getInstance("X.509");
 
-            FileInputStream CAIs = new FileInputStream(CACertPath);
-            CACert = (X509Certificate) fact.generateCertificate(CAIs);
-
-            FileInputStream userIs = new FileInputStream(userCertPath);
-            userCert = (X509Certificate) fact.generateCertificate(userIs);
-
-        } catch (CertificateException | FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        FileInputStream CAIs = new FileInputStream(CACertPath);
+        CACert = (X509Certificate) fact.generateCertificate(CAIs);
     }
 
     public void printCACertDN () {

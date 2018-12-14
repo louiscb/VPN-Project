@@ -22,11 +22,6 @@ public class SessionKey {
         return secretKey;
     }
 
-    public IvParameterSpec getIV() {
-        //GENERATE IV
-        return null;
-    }
-
     public String encodeKey() {
         String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
         return encodedKey;

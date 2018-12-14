@@ -1,7 +1,7 @@
 package communication.threads; /**
  * ForwardServerClientThread handles the clients of Nakov Forward Server. It
  * connects two sockets and starts the TCP forwarding between given client
- * and its assigned server. After the forwarding is failed and the two communication.asdf.threads
+ * and its assigned server. After the forwarding is failed and the two threads
  * are stopped, closes the sockets.
  *
  */
@@ -66,8 +66,8 @@ public class ForwardServerClientThread extends Thread
 
     /**
      * Obtains a destination server socket to some of the servers in the list.
-     * Starts two communication.asdf.threads for forwarding : "client in <--> dest server out" and
-     * "dest server in <--> client out", waits until one of these communication.asdf.threads stop
+     * Starts two threads for forwarding : "client in <--> dest server out" and
+     * "dest server in <--> client out", waits until one of these threads stop
      * due to read/write failure or connection closure. Closes opened connections.
      * 
      * If there is a listen socket, first wait for incoming connection
