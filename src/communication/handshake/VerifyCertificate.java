@@ -8,6 +8,7 @@ public class VerifyCertificate {
     private X509Certificate CACert;
     private X509Certificate userCert;
 
+    //Change userCertPath to string
     public VerifyCertificate (String CACertPath, String userCertPath) {
         try {
             CertificateFactory fact = CertificateFactory.getInstance("X.509");
@@ -52,7 +53,7 @@ public class VerifyCertificate {
         return true;
     }
 
-    private boolean isUserVerified() {
+    public boolean isUserVerified() {
         System.out.println("\nVerifying user's certificate:");
 
         if (!isDateValid(CACert))

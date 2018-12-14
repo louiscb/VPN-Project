@@ -8,12 +8,16 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 public class SessionEncrypter {
-    SessionKey sessionKey;
-    IvParameterSpec ivParameterSpec;
+    public SessionKey sessionKey;
+    public IvParameterSpec ivParameterSpec;
     byte[] iv;
 
-    public SessionEncrypter (Integer keyLength) {
+    public void createSessionKey (Integer keyLength) {
         sessionKey = new SessionKey(keyLength);
+    }
+
+    public void createIV () {
+        ivParameterSpec = null;
     }
 
     public String encodeKey() {

@@ -2,6 +2,7 @@ package communication.session;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -19,6 +20,11 @@ public class SessionKey {
 
     public SecretKey getSecretKey() {
         return secretKey;
+    }
+
+    public IvParameterSpec getIV() {
+        //GENERATE IV
+        return null;
     }
 
     public String encodeKey() {

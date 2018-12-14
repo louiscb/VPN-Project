@@ -35,7 +35,7 @@ public class HandshakeMessage extends Properties {
     }
 
     /*
-     * Send a communication.asdf.handshake message out on a socket
+     * Send a handshake message out on a socket
      *
      * Use the built-in encoding of Properties as XML:
      *   - Encode the message in XML
@@ -57,7 +57,7 @@ public class HandshakeMessage extends Properties {
     }
 
     /*
-     * Receive a communication.asdf.handshake message on a socket
+     * Receive a handshake message on a socket
      *
      * First read a string with an integer followed by whitespace, 
      * which gives the size of the message in bytes. Then read the XML data
@@ -65,11 +65,14 @@ public class HandshakeMessage extends Properties {
      */
     public void recv(Socket socket) throws IOException {
         int length = 0;
+
         for (int n = socket.getInputStream().read(); !Character.isWhitespace(n); n = socket.getInputStream().read()) {
             length = length*10 + Character.getNumericValue(n);
         }
+
         byte[] data = new byte[length];
         int nread = 0;
+
         while (nread < length) {
             nread += socket.getInputStream().read(data, nread, length-nread);
         }
