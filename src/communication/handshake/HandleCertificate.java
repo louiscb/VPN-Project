@@ -1,49 +1,27 @@
 package communication.handshake;
 
-import java.io.FileInputStream;
 import java.security.cert.*;
 
-public class handleCertificate {
+public class HandleCertificate {
     private X509Certificate CACert;
-    private X509Certificate ourCert;
     private X509Certificate userCert;
 
-    //Change userCertPath to string
-    public handleCertificate(String CACertPath) throws Exception {
-        CertificateFactory fact = CertificateFactory.getInstance("X.509");
-
-        FileInputStream CAIs = new FileInputStream(CACertPath);
-        CACert = (X509Certificate) fact.generateCertificate(CAIs);
+    //have to pass CA file
+    public HandleCertificate(String CACertPath) throws Exception {
+        CACert = aCertificate.pathToCert(CACertPath);
     }
 
-    public void printCACertDN () {
-        System.out.println("Here is the CA's DN");
-        System.out.println(CACert.getSubjectDN());
-    }
-
-    public void printUserCertDN () {
-        System.out.println("Here is the User's DN");
-        System.out.println(userCert.getSubjectDN());
-    }
-
-    public void verify(aCertificate userCert) {
-        this.userCert = userCert.getCert();
-
-        if (isCAVerified() && isUserVerified()) {
-            System.out.println("\nPASS");
-        } else {
-            System.out.println("\nFAIL");
-        }
+    public boolean verify(X509Certificate userCert) {
+        this.userCert = userCert;
+        return (isCAVerified() && isUserVerified());
     }
 
     private boolean isCAVerified() {
-        System.out.println("\nVerifying CA's certificate:");
+        //System.out.println("\nVerifying CA's certificate:");
 
-        if (!isDateValid(CACert))
-            return false;
+        //return isDateValid(CACert);
 
-        //Do I need to check that the CA is self verified?
-
+        //just for now as logs are annoying
         return true;
     }
 
@@ -77,4 +55,14 @@ public class handleCertificate {
             return false;
         }
     }
+
+    //    public void printCACertDN () {
+//        System.out.println("Here is the CA's DN");
+//        System.out.println(CACert.getSubjectDN());
+//    }
+//
+//    public void printUserCertDN () {
+//        System.out.println("Here is the User's DN");
+//        System.out.println(userCert.getSubjectDN());
+//    }
 }

@@ -2,6 +2,8 @@ package meta.tests;
 
 import communication.handshake.aCertificate;
 
+import java.security.cert.X509Certificate;
+
 public class VPNTester {
     public void main(String[] args) {
         testaCertificate();
@@ -32,13 +34,11 @@ public class VPNTester {
                 "mL4=\n" +
                 "-----END CERTIFICATE-----\n";
         try {
-            aCertificate cert = new aCertificate();
-            cert.stringToCert(testS);
-            System.out.println(cert.getCert().getIssuerDN());
+            X509Certificate cert = aCertificate.stringToCert(testS);
 
-            aCertificate test2 = new aCertificate();
-            test2.stringToCert(cert.encodeCert());
-            System.out.println(test2.getCert().getIssuerDN());
+            System.out.println(cert.getIssuerDN());
+
+            System.out.println(aCertificate.stringToCert(aCertificate.encodeCert(cert)).getIssuerDN());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +63,7 @@ public class VPNTester {
     }
 
     private static void testVerifyCertificate() {
-        handleCertificate vC = new handleCertificate("certs/CA.pem", "certs/user.pem");
+        HandleCertificate vC = new HandleCertificate("certs/CA.pem", "certs/user.pem");
         vC.verify();
     }
 

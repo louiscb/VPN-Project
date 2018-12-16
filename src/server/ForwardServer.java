@@ -13,10 +13,10 @@ package server; /**
  * (c) 2001 by Svetlin Nakov - http://www.nakov.com
  */
  
+import communication.handshake.HandleCertificate;
 import communication.handshake.Handshake;
 import communication.handshake.HandshakeMessage;
 import communication.handshake.aCertificate;
-import communication.handshake.handleCertificate;
 import communication.session.IV;
 import communication.session.SessionKey;
 import meta.Arguments;
@@ -30,6 +30,7 @@ import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 
 public class ForwardServer
 {
@@ -118,20 +119,25 @@ public class ForwardServer
             throw new Error();
         }
 
+        //get client certificate from message
         String clientCertString = clientHello.getParameter("Certificate");
-        aCertificate clientCert = new aCertificate();
-        clientCert.stringToCert(clientCertString);
+        X509Certificate clientCert = aCertificate.stringToCert(clientCertString);
 
-        if (!handleCertificate.isUserVerified(clientCert)) {
+        //verify certificate is signed by our CA
+        HandleCertificate handleCertificate = new HandleCertificate(Common.CA_PATH);
+
+        if (!handleCertificate.verify(clientCert)) {
+            System.err.println("CLIENT CA FAILED VERIFICATION");
             clientSocket.close();
             throw new Error();
+        } else {
+            Logger.log("Successful verification of client cert");
         }
 
         // Client is verified, proceed to sending ServerHello
-
         HandshakeMessage serverHello = new HandshakeMessage();
         serverHello.putParameter(Common.MESSAGE_TYPE, Common.SERVER_HELLO);
-        serverHello.putParameter(Common.CERTIFICATE, "server certificaeteasd");
+        serverHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(Common.SERVER_CERT_PATH)));
         serverHello.send(clientSocket);
 
         //step 6 server recieves ForwardMessage from client and sets up session
@@ -139,7 +145,7 @@ public class ForwardServer
         forwardMessage.recv(clientSocket);
 
         if (!clientHello.getParameter(Common.MESSAGE_TYPE).equals(Common.FORWARD_MSG)) {
-            System.err.println("Received invalid message type! Shoud be forward message");
+            System.err.println("Received invalid message type! Should be forward message");
             clientSocket.close();
             throw new Error();
         }
@@ -156,8 +162,6 @@ public class ForwardServer
         // encrypt secretKey and IV with client's public key
         // create a message, called session message
         // send to client
-
-
 
         clientSocket.close(); //end of handshake
     }

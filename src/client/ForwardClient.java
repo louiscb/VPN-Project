@@ -14,11 +14,14 @@ package client; /**
  */
 
 
+import communication.handshake.HandleCertificate;
 import communication.handshake.Handshake;
 import communication.handshake.HandshakeMessage;
-import communication.handshake.handleCertificate;
+import communication.handshake.aCertificate;
 import meta.Arguments;
 import communication.threads.ForwardServerClientThread;
+import meta.Common;
+import meta.Logger;
 
 import java.lang.IllegalArgumentException;
 import java.lang.Integer;
@@ -27,6 +30,7 @@ import java.net.Socket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 
 public class ForwardClient {
     private static final boolean ENABLE_LOGGING = true;
@@ -61,12 +65,12 @@ public class ForwardClient {
 
         try {
             startForwardClient();
-        } catch(IOException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void doHandshake() throws IOException {
+    private static void doHandshake() throws Exception {
         /* Connect to forward server server */
         System.out.println("Connect to " +  arguments.get("handshakehost") + ":" + Integer.parseInt(arguments.get("handshakeport")));
         Socket socket = new Socket(arguments.get("handshakehost"), Integer.parseInt(arguments.get("handshakeport")));
@@ -76,30 +80,35 @@ public class ForwardClient {
         //Step 1 Client Hello
         HandshakeMessage clientHello = new HandshakeMessage();
 
-        clientHello.putParameter("MessageType", "ClientHello");
-        clientHello.putParameter("Certificate", "ClientCert");
+        clientHello.putParameter(Common.MESSAGE_TYPE, Common.CLIENT_HELLO);
+        clientHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(Common.CLIENT_CERT_PATH)));
         clientHello.send(socket);
 
         //Step 3 receiving serverHello
         HandshakeMessage serverHello = new HandshakeMessage();
         serverHello.recv(socket);
 
-        if (!serverHello.getParameter("MessageType").equals("ServerHello")) {
+        //verify that it is in fact a serverHello
+        if (!serverHello.getParameter(Common.MESSAGE_TYPE).equals(Common.SERVER_HELLO)) {
             System.out.println("Received invalid handshake type!");
             socket.close();
             throw new Error();
         }
 
-        //Step 4 verifies serveHello
+        //Step 4 verifies serveHello certificate is signed by our CA
+        String serverCertString = serverHello.getParameter(Common.CERTIFICATE);
+        X509Certificate serverCert = aCertificate.stringToCert(serverCertString);
 
-        String serverCert = serverHello.getParameter("Certificate");
-        // PROBLEM
-       // handleCertificate handleCertificate = new handleCertificate("CaCertPath.pem", serverCert);
+        //verify certificate is signed by our CA
+        HandleCertificate handleCertificate = new HandleCertificate(Common.CA_PATH);
 
-//        if (!handleCertificate.isUserVerified()) {
-//            socket.close();
-//            throw new Error();
-//        }
+        if (!handleCertificate.verify(serverCert)) {
+            System.err.println("SERVER CA FAILED VERIFICATION");
+            socket.close();
+            throw new Error();
+        } else {
+            Logger.log("Successful verification of server cert");
+        }
 
         //step 5 client request forwarding port
         HandshakeMessage forwardMessage = new HandshakeMessage();
@@ -142,8 +151,7 @@ public class ForwardClient {
      * Run communication.asdf.handshake negotiation, then set up a listening socket and wait for user.
      * When user has connected, start port forwarder thread.
      */
-    static public void startForwardClient() throws IOException {
-
+    static public void startForwardClient() throws Exception {
         doHandshake();
         setUpSession();
 
