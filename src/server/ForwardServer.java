@@ -16,6 +16,7 @@ package server; /**
 import communication.handshake.Handshake;
 import communication.handshake.HandshakeMessage;
 import communication.handshake.aCertificate;
+import communication.handshake.handleCertificate;
 import communication.session.IV;
 import communication.session.SessionKey;
 import meta.Arguments;
@@ -29,7 +30,6 @@ import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.io.IOException;
-import java.security.cert.Certificate;
 
 public class ForwardServer
 {
@@ -107,10 +107,6 @@ public class ForwardServer
         String clientHostPort = clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort();
         Logger.log("Incoming handshake connection from " + clientHostPort);
 
-        /*
-            Do handshake steps here
-         */
-
         //Step 2, get ClientHello and verify
 
         HandshakeMessage clientHello = new HandshakeMessage();
@@ -122,10 +118,11 @@ public class ForwardServer
             throw new Error();
         }
 
-        String clientCert = clientHello.getParameter("Certificate");
-        aCertificate aCertificate = new aCertificate("CaCertPath.pem", clientCert);
+        String clientCertString = clientHello.getParameter("Certificate");
+        aCertificate clientCert = new aCertificate();
+        clientCert.stringToCert(clientCertString);
 
-        if (!aCertificate.isUserVerified()) {
+        if (!handleCertificate.isUserVerified(clientCert)) {
             clientSocket.close();
             throw new Error();
         }

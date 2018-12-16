@@ -16,7 +16,7 @@ package client; /**
 
 import communication.handshake.Handshake;
 import communication.handshake.HandshakeMessage;
-import communication.handshake.aCertificate;
+import communication.handshake.handleCertificate;
 import meta.Arguments;
 import communication.threads.ForwardServerClientThread;
 
@@ -42,8 +42,7 @@ public class ForwardClient {
      * Program entry point. Reads arguments and run
      * the forward server
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         try {
             arguments = new Arguments();
             arguments.setDefault("handshakeport", Integer.toString(DEFAULTSERVERPORT));
@@ -95,12 +94,12 @@ public class ForwardClient {
 
         String serverCert = serverHello.getParameter("Certificate");
         // PROBLEM
-        aCertificate aCertificate = new aCertificate("CaCertPath.pem", serverCert);
+       // handleCertificate handleCertificate = new handleCertificate("CaCertPath.pem", serverCert);
 
-        if (!aCertificate.isUserVerified()) {
-            socket.close();
-            throw new Error();
-        }
+//        if (!handleCertificate.isUserVerified()) {
+//            socket.close();
+//            throw new Error();
+//        }
 
         //step 5 client request forwarding port
         HandshakeMessage forwardMessage = new HandshakeMessage();

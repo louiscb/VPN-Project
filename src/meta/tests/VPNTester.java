@@ -1,11 +1,48 @@
 package meta.tests;
 
 import communication.handshake.aCertificate;
-import communication.session.SessionKey;
 
 public class VPNTester {
-    public static void main(String[] args) {
+    public void main(String[] args) {
+        testaCertificate();
         /*test();*/
+    }
+
+    private void testaCertificate() {
+        String testS = "-----BEGIN CERTIFICATE-----\n" +
+                "MIIDjjCCAnYCCQDjsWS7GJ4tMjANBgkqhkiG9w0BAQsFADCBiDELMAkGA1UEBhMC\n" +
+                "U0UxEjAQBgNVBAgMCVN0b2NraG9sbTEOMAwGA1UEBwwFS2lzdGExDDAKBgNVBAoM\n" +
+                "A0tUaDEMMAoGA1UECwwDSUNUMRowGAYDVQQDDBFJbnRlcm5ldCBTZWN1cml0eTEd\n" +
+                "MBsGCSqGSIb3DQEJARYObG91aXNjYkBrdGguc2UwHhcNMTgxMTI3MjI0ODQwWhcN\n" +
+                "MjEwODIzMjI0ODQwWjCBiDELMAkGA1UEBhMCU0UxEjAQBgNVBAgMCVN0b2NraG9s\n" +
+                "bTEOMAwGA1UEBwwFS2lzdGExDDAKBgNVBAoMA0tUaDEMMAoGA1UECwwDSUNUMRow\n" +
+                "GAYDVQQDDBFJbnRlcm5ldCBTZWN1cml0eTEdMBsGCSqGSIb3DQEJARYObG91aXNj\n" +
+                "YkBrdGguc2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCgmCBuI2g8\n" +
+                "19D3S4PLmvOpw1b8+nCEYm1ts5wlp4whL5DT81Y4rE+iPSY8IkExm7/BQk7PR1Yg\n" +
+                "rWbI/Wi0NDYauTZyArW4TO0beL46/wgd0PHVB8OB89JkQbpgGDhYQAP2obGpgURe\n" +
+                "hJVO608T3ZksEZm2pNLC1OprywG86f8Ojows8WYlU74p6j0MrqmBOYxJPbq3OLs5\n" +
+                "IgnnJXtdAkW9RdlCmZ2XElYwAbQrytVtvCtsSh1bLz4jcqycUUO7m9+YVD5+PKfO\n" +
+                "0hnttgfyDphIYexgliXGSeM+sz61Nz8kTqYL3X6CutObDHGJt8D8mcZViM2XDUkA\n" +
+                "qpOno48SvFMNAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAI/RqXFBxFRID85oQZe7\n" +
+                "6qPeok+DaP9LG8NvnpdcXlweJ2bFJzuLXfNq0CmdGNgASQOv5HpMPz5tfZxm3mYt\n" +
+                "Xhxy6Jwu1iukvtAiJenRQFjaeSgg11ORZZ9DjuxUUZaKIi+eYMZV0fSniGOBW8DJ\n" +
+                "bCZX85Wrl8JAdG2O0UUiq43t7fiCAIe7mVcfhYKIKsRqUl7er5O9bJsiviskrmBV\n" +
+                "v6b7GEniLaoyUzMM4zxEpcyIFumDavPQcMrPcHbTmGzTatlBCRMppR8EseJbjkcJ\n" +
+                "xyUTDOon+O3w/SnmxVYNcvxoQdaBa4QY2Vik/8gL9zogJlUEFqGUKIICJ6MdSJy9\n" +
+                "mL4=\n" +
+                "-----END CERTIFICATE-----\n";
+        try {
+            aCertificate cert = new aCertificate();
+            cert.stringToCert(testS);
+            System.out.println(cert.getCert().getIssuerDN());
+
+            aCertificate test2 = new aCertificate();
+            test2.stringToCert(cert.encodeCert());
+            System.out.println(test2.getCert().getIssuerDN());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 /*
     private static void test() {
@@ -26,7 +63,7 @@ public class VPNTester {
     }
 
     private static void testVerifyCertificate() {
-        aCertificate vC = new aCertificate("certs/CA.pem", "certs/user.pem");
+        handleCertificate vC = new handleCertificate("certs/CA.pem", "certs/user.pem");
         vC.verify();
     }
 
