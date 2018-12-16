@@ -144,11 +144,13 @@ public class ForwardServer
         HandshakeMessage forwardMessage = new HandshakeMessage();
         forwardMessage.recv(clientSocket);
 
-        if (!clientHello.getParameter(Common.MESSAGE_TYPE).equals(Common.FORWARD_MSG)) {
+        if (!forwardMessage.getParameter(Common.MESSAGE_TYPE).equals(Common.FORWARD_MSG)) {
             System.err.println("Received invalid message type! Should be forward message");
             clientSocket.close();
             throw new Error();
         }
+
+
 
         Handshake.setTargetHost(forwardMessage.getParameter(Common.TARGET_HOST));
         Handshake.setTargetPort(Integer.parseInt(forwardMessage.getParameter(Common.TARGET_PORT)));

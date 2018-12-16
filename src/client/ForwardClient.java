@@ -90,7 +90,7 @@ public class ForwardClient {
 
         //verify that it is in fact a serverHello
         if (!serverHello.getParameter(Common.MESSAGE_TYPE).equals(Common.SERVER_HELLO)) {
-            System.out.println("Received invalid handshake type!");
+            System.err.println("Received invalid handshake type!");
             socket.close();
             throw new Error();
         }
@@ -110,12 +110,13 @@ public class ForwardClient {
             Logger.log("Successful verification of server cert");
         }
 
-        //step 5 client request forwarding port
+        //step 5 client requests connection to target
         HandshakeMessage forwardMessage = new HandshakeMessage();
-        forwardMessage.putParameter("MessageType", "Forward");
-        forwardMessage.putParameter("TargetHost", arguments.get("targethost"));
-        forwardMessage.putParameter("TargetPort", arguments.get("targetport"));
+        forwardMessage.putParameter(Common.MESSAGE_TYPE, Common.FORWARD_MSG);
+        forwardMessage.putParameter(Common.TARGET_HOST, arguments.get("targethost"));
+        forwardMessage.putParameter(Common.TARGET_PORT, arguments.get("targetport"));
 
+        Logger.log("Sent forward message...");
         forwardMessage.send(socket);
 
 
