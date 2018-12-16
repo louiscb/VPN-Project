@@ -13,10 +13,7 @@ package server; /**
  * (c) 2001 by Svetlin Nakov - http://www.nakov.com
  */
  
-import communication.handshake.HandleCertificate;
-import communication.handshake.Handshake;
-import communication.handshake.HandshakeMessage;
-import communication.handshake.aCertificate;
+import communication.handshake.*;
 import communication.session.IV;
 import communication.session.SessionKey;
 import meta.Arguments;
@@ -140,7 +137,7 @@ public class ForwardServer
         serverHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(Common.SERVER_CERT_PATH)));
         serverHello.send(clientSocket);
 
-        //step 6 server recieves ForwardMessage from client and sets up session
+        //step 6 server receives ForwardMessage from client and sets up session
         HandshakeMessage forwardMessage = new HandshakeMessage();
         forwardMessage.recv(clientSocket);
 
@@ -150,20 +147,30 @@ public class ForwardServer
             throw new Error();
         }
 
-
-
+        //Set client's desired target as handshake target
         Handshake.setTargetHost(forwardMessage.getParameter(Common.TARGET_HOST));
         Handshake.setTargetPort(Integer.parseInt(forwardMessage.getParameter(Common.TARGET_PORT)));
 
+        //step 6.1 generate session key and iv
         sessionKey = new SessionKey(Common.KEY_LENGTH);
         iv = new IV();
 
-        final String secretKey = sessionKey.encodeKey();
+        final String sessionKeyString = sessionKey.encodeKey();
         final String ivString = iv.encodeIV();
 
-        // encrypt secretKey and IV with client's public key
-        // create a message, called session message
-        // send to client
+        //step 6.2 encrypt secretKey and IV with client's public key
+        System.out.println(clientCert.getPublicKey().toString());
+
+        String encryptedSessionKey = EncryptText.run(sessionKeyString, clientCert.getPublicKey());
+        String encryptedIV = EncryptText.run(ivString, clientCert.getPublicKey());
+
+        //step 7 Server sends client session message
+        HandshakeMessage sessionMsg = new HandshakeMessage();
+        sessionMsg.putParameter(Common.MESSAGE_TYPE, Common.SESSION_MSG);
+        sessionMsg.putParameter(Common.SESSION_KEY, encryptedSessionKey);
+        sessionMsg.putParameter(Common.SESSION_IV, encryptedIV);
+
+        sessionMsg.send(clientSocket);
 
         clientSocket.close(); //end of handshake
     }

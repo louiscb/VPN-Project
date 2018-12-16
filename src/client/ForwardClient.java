@@ -116,9 +116,18 @@ public class ForwardClient {
         forwardMessage.putParameter(Common.TARGET_HOST, arguments.get("targethost"));
         forwardMessage.putParameter(Common.TARGET_PORT, arguments.get("targetport"));
 
-        Logger.log("Sent forward message...");
         forwardMessage.send(socket);
+        Logger.log("Sent forward message...");
 
+        //step 8 receive session information from server
+        HandshakeMessage sessionMessage = new HandshakeMessage();
+        sessionMessage.recv(socket);
+
+        if (!sessionMessage.getParameter(Common.MESSAGE_TYPE).equals(Common.SESSION_MSG)) {
+            System.err.println("Received invalid handshake type! Should be session");
+            socket.close();
+            throw new Error();
+        }
 
         socket.close();
     }
