@@ -15,6 +15,7 @@ package client; /**
 
 
 import communication.handshake.*;
+import communication.session.IV;
 import communication.session.SessionKey;
 import communication.threads.ForwardServerClientThread;
 import meta.Arguments;
@@ -63,6 +64,37 @@ public class ForwardClient {
             startForwardClient();
         } catch(Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    static public void startForwardClient() throws Exception {
+        doHandshake();
+        setUpSession();
+
+        // Wait for client. Accept one connection.
+        ForwardServerClientThread forwardThread;
+        ServerSocket listensocket;
+
+        try {
+            /* Create a new socket. This is to where the user should connect.
+             * client.ForwardClient sets up port forwarding between this socket
+             * and the ServerHost/ServerPort learned from the handshake */
+            listensocket = new ServerSocket();
+            /* Let the system pick a port number */
+            listensocket.bind(null);
+            /* Tell the user, so the user knows where to connect */
+            tellUser(listensocket);
+
+            Socket clientSocket = listensocket.accept();
+            String clientHostPort = clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort();
+            log("Accepted client from " + clientHostPort);
+
+            forwardThread = new ForwardServerClientThread(clientSocket, serverHost, serverPort);
+            forwardThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e);
+            throw e;
         }
     }
 
@@ -130,9 +162,8 @@ public class ForwardClient {
         String sessionKeyDecrypted = AsymmetricCrypto.decrypt(sessionMessage.getParameter(Common.SESSION_KEY), clientPrivKey);
         String sessionIVDecrypted = AsymmetricCrypto.decrypt(sessionMessage.getParameter(Common.SESSION_IV), clientPrivKey);
 
-        SessionKey sessionKey = new SessionKey(sessionKeyDecrypted);
-
-        log(sessionKey.encodeKey());
+        Handshake.sessionKey = new SessionKey(sessionKeyDecrypted);
+        Handshake.iv = new IV(sessionIVDecrypted);
 
         //need to do shit here
         log("Handshake successful!");
@@ -169,36 +200,6 @@ public class ForwardClient {
      * Run handshake negotiation, then set up a listening socket and wait for user.
      * When user has connected, start port forwarder thread.
      */
-    static public void startForwardClient() throws Exception {
-        doHandshake();
-        setUpSession();
-
-        // Wait for client. Accept one connection.
-        ForwardServerClientThread forwardThread;
-        ServerSocket listensocket;
-
-        try {
-            /* Create a new socket. This is to where the user should connect.
-             * client.ForwardClient sets up port forwarding between this socket
-             * and the ServerHost/ServerPort learned from the handshake */
-            listensocket = new ServerSocket();
-            /* Let the system pick a port number */
-            listensocket.bind(null);
-            /* Tell the user, so the user knows where to connect */
-            tellUser(listensocket);
-
-            Socket clientSocket = listensocket.accept();
-            String clientHostPort = clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort();
-            log("Accepted client from " + clientHostPort);
-
-            forwardThread = new ForwardServerClientThread(clientSocket, serverHost, serverPort);
-            forwardThread.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println(e);
-            throw e;
-        }
-    }
 
     /**
      * Prints given log message on the standard output if logging is enabled,

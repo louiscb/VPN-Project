@@ -43,9 +43,6 @@ public class ForwardServer
     private String targetHost;
     private int targetPort;
 
-    SessionKey sessionKey;
-    IV iv;
-
     /**
      * Program entry point. Reads settings, starts check-alive thread and
      * the forward server
@@ -154,12 +151,13 @@ public class ForwardServer
         Handshake.setTargetPort(Integer.parseInt(forwardMessage.getParameter(Common.TARGET_PORT)));
 
         //step 6.1 generate session key and iv
-        sessionKey = new SessionKey(Common.KEY_LENGTH);
-        iv = new IV();
+        SessionKey sessionKey = new SessionKey(Common.KEY_LENGTH);
+        IV iv = new IV();
+
+        Handshake.sessionKey = sessionKey;
+        Handshake.iv = iv;
 
         //step 6.2 encrypt secretKey and IV with client's public key
-        log("session key \n" + sessionKey.encodeKey());
-
         String encryptedSessionKey = AsymmetricCrypto.encrypt(sessionKey.encodeKey(), clientCert.getPublicKey());
         String encryptedIV = AsymmetricCrypto.encrypt(iv.encodeIV(), clientCert.getPublicKey());
 

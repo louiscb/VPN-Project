@@ -5,12 +5,12 @@ import javax.crypto.CipherInputStream;
 import java.io.InputStream;
 
 public class SessionDecrypter {
-    SessionKey sessionKey;
-    IV iv;
+    private SessionKey sessionKey;
+    private IV iv;
 
-    public SessionDecrypter(String key, String iv) {
-        sessionKey = new SessionKey(key);
-        this.iv = new IV(iv);
+    public SessionDecrypter(SessionKey key, IV iv) {
+        sessionKey = key;
+        this.iv = iv;
     }
 
     public CipherInputStream openCipherInputStream (InputStream input) {
@@ -22,5 +22,21 @@ public class SessionDecrypter {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public SessionKey getSessionKey() {
+        return sessionKey;
+    }
+
+    public void setSessionKey(SessionKey sessionKey) {
+        this.sessionKey = sessionKey;
+    }
+
+    public IV getIv() {
+        return iv;
+    }
+
+    public void setIv(IV iv) {
+        this.iv = iv;
     }
 }

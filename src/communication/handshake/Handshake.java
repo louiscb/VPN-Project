@@ -1,5 +1,8 @@
 package communication.handshake;
 
+import communication.session.IV;
+import communication.session.SessionKey;
+
 public class Handshake {
     /* Where the client forwarder forwards data from  */
     public static final String serverHost = "localhost";
@@ -8,6 +11,9 @@ public class Handshake {
     /* The final destination */
     public static String targetHost = "localhost";
     public static int targetPort = 6789;
+
+    public static SessionKey sessionKey;
+    public static IV iv;
 
     public static String getServerHost() {
         return serverHost;
