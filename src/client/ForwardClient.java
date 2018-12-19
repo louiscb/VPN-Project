@@ -109,7 +109,7 @@ public class ForwardClient {
         HandshakeMessage clientHello = new HandshakeMessage();
 
         clientHello.putParameter(Common.MESSAGE_TYPE, Common.CLIENT_HELLO);
-        clientHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(Common.CLIENT_CERT_PATH)));
+        clientHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(arguments.get("usercert"))));
         clientHello.send(socket);
 
         //Step 3 receiving serverHello
@@ -128,7 +128,7 @@ public class ForwardClient {
         X509Certificate serverCert = aCertificate.stringToCert(serverCertString);
 
         //verify certificate is signed by our CA
-        HandleCertificate handleCertificate = new HandleCertificate(Common.CA_PATH);
+        HandleCertificate handleCertificate = new HandleCertificate(arguments.get("cacert"));
 
         if (!handleCertificate.verify(serverCert)) {
             System.err.println("SERVER CA FAILED VERIFICATION");
@@ -157,7 +157,7 @@ public class ForwardClient {
         }
 
         //decrypt session message to get session key and iv
-        PrivateKey clientPrivKey = AsymmetricCrypto.getPrivateKeyFromKeyFile(Common.CLIENT_PRIV_KEY_PATH);
+        PrivateKey clientPrivKey = AsymmetricCrypto.getPrivateKeyFromKeyFile(arguments.get("key"));
 
         String sessionKeyDecrypted = AsymmetricCrypto.decrypt(sessionMessage.getParameter(Common.SESSION_KEY), clientPrivKey);
         String sessionIVDecrypted = AsymmetricCrypto.decrypt(sessionMessage.getParameter(Common.SESSION_IV), clientPrivKey);

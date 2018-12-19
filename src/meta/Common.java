@@ -16,8 +16,8 @@ public class Common {
     public static final String SESSION_IV = "SessionIV";
 
     //PATHS TO CERT FILES
-    public static final String CA_PATH = "certs/CA.pem";
-    public static final String SERVER_CERT_PATH = "certs/user.pem";
-    public static final String CLIENT_CERT_PATH = "certs/user.pem";
-    public static final String CLIENT_PRIV_KEY_PATH = "certs/privateuserkey.der";
+    public static final String CA_PATH = "certs/new/CA.pem";
+    public static final String SERVER_CERT_PATH = "certs/new/server.pem";
+    public static final String CLIENT_CERT_PATH = "certs/new/client.pem";
+    public static final String CLIENT_PRIV_KEY_PATH = "certs/new/clientprivatekey.der";
 }

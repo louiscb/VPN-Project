@@ -9,7 +9,6 @@ import communication.handshake.Handshake;
 import communication.session.SessionDecrypter;
 import communication.session.SessionEncrypter;
 
-import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,22 +57,22 @@ public class ForwardThread extends Thread  {
 
                     CipherOutputStream cipherOutputStream = sessionEncrypter.openCipherOutputStream(mOutputStream);
                     cipherOutputStream.write(buffer, 0, bytesRead);
-                } else {
-                    CipherInputStream cipherInputStream = sessionDecrypter.openCipherInputStream(mInputStream);
-                    int bytesRead = cipherInputStream.read(buffer);
-                    if (bytesRead == -1)
-                        break; // End of stream is reached --> exit the thread
-                    mOutputStream.write(buffer, 0, bytesRead);
-                    mOutputStream.flush();
-                }
-                //UNCOMMENT THIS TO TEST THAT ENCRYPTION IS WORKING
 //                } else {
-//                    int bytesRead = mInputStream.read(buffer);
+//                    CipherInputStream cipherInputStream = sessionDecrypter.openCipherInputStream(mInputStream);
+//                    int bytesRead = cipherInputStream.read(buffer);
 //                    if (bytesRead == -1)
-//                        break;
-//
+//                        break; // End of stream is reached --> exit the thread
 //                    mOutputStream.write(buffer, 0, bytesRead);
+//                    mOutputStream.flush();
 //                }
+                //UNCOMMENT THIS TO TEST THAT ENCRYPTION IS WORKING
+                } else {
+                    int bytesRead = mInputStream.read(buffer);
+                    if (bytesRead == -1)
+                        break;
+
+                    mOutputStream.write(buffer, 0, bytesRead);
+                }
             }
         } catch (Exception e) {
             // Read/write failed --> connection is broken --> exit the thread

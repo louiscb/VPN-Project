@@ -120,7 +120,7 @@ public class ForwardServer
         X509Certificate clientCert = aCertificate.stringToCert(clientCertString);
 
         //verify certificate is signed by our CA
-        HandleCertificate handleCertificate = new HandleCertificate(Common.CA_PATH);
+        HandleCertificate handleCertificate = new HandleCertificate(arguments.get("cacert"));
 
         if (!handleCertificate.verify(clientCert)) {
             System.err.println("CLIENT CA FAILED VERIFICATION");
@@ -133,7 +133,7 @@ public class ForwardServer
         // Client is verified, proceed to sending ServerHello
         HandshakeMessage serverHello = new HandshakeMessage();
         serverHello.putParameter(Common.MESSAGE_TYPE, Common.SERVER_HELLO);
-        serverHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(Common.SERVER_CERT_PATH)));
+        serverHello.putParameter(Common.CERTIFICATE, aCertificate.encodeCert(aCertificate.pathToCert(arguments.get("usercert"))));
         serverHello.send(clientSocket);
 
         //step 6 server receives ForwardMessage from client and sets up session
