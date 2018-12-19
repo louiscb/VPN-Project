@@ -19,14 +19,11 @@ public class HandleCertificate {
     private boolean isCAVerified() {
         //System.out.println("\nVerifying CA's certificate:");
 
-        //return isDateValid(CACert);
-
-        //just for now as logs are annoying
-        return true;
+        return isDateValid(CACert);
     }
 
     private boolean isUserVerified() {
-        System.out.println("\nVerifying user's certificate:");
+       // System.out.println("\nVerifying user's certificate:");
 
         if (!isDateValid(CACert))
             return false;
@@ -35,9 +32,9 @@ public class HandleCertificate {
         //that corresponds to the CA's public key
         try {
             userCert.verify(CACert.getPublicKey());
-            System.out.println("-> User certificate is signed by CA");
+        //    System.out.println("-> User certificate is signed by CA");
         } catch (Exception e) {
-            System.out.println("ERROR: User certificate not signed by CA");
+            System.err.println("ERROR: User certificate not signed by CA");
             return false;
         }
 
@@ -48,10 +45,10 @@ public class HandleCertificate {
         //checking date & expiration of cert
         try {
             certificate.checkValidity();
-            System.out.println("-> The certificate has not expired & is valid");
+           // System.out.println("-> The certificate has not expired & is valid");
             return true;
         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-            System.out.println("ERROR: Certificate's dates are not valid");
+            System.err.println("ERROR: Certificate's dates are not valid");
             return false;
         }
     }

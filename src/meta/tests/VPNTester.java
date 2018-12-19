@@ -82,7 +82,7 @@ public class VPNTester {
         TestSessionCrypto testSessionCrypto = new TestSessionCrypto();
 
         try {
-            testSessionCrypto.run();
+            testSessionCrypto.encrypt();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -90,7 +90,7 @@ public class VPNTester {
 
     private static void testHandshakeCrypto() {
         try {
-            HandshakeCryptoTester.run();
+            HandshakeCryptoTester.encrypt();
         } catch (Exception e) {
             e.printStackTrace();
         }

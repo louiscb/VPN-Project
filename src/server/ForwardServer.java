@@ -70,6 +70,7 @@ public class ForwardServer
     public void startForwardServer() throws Exception {
         // Bind server on given TCP port
         int port = Integer.parseInt(arguments.get("handshakeport"));
+        String address = arguments.get("handshakehost");
 
         try {
             handshakeSocket = new ServerSocket(port);
@@ -77,7 +78,8 @@ public class ForwardServer
            throw new IOException("Unable to bind to port " + port);
         }
 
-        log("Forward Server started on TCP port " + port);
+        log("Forward Server started at address " + address + " on TCP port " + port);
+        log("Waiting for connections...");
  
         // Accept client connections and process them until stopped
         while(true) {
@@ -128,7 +130,7 @@ public class ForwardServer
             clientSocket.close();
             throw new Error();
         } else {
-            Logger.log("Successful verification of client cert");
+            //Logger.log("Successful verification of client certificate...");
         }
 
         // Client is verified, proceed to sending ServerHello
@@ -155,14 +157,11 @@ public class ForwardServer
         sessionKey = new SessionKey(Common.KEY_LENGTH);
         iv = new IV();
 
-        final String sessionKeyString = sessionKey.encodeKey();
-        final String ivString = iv.encodeIV();
-
         //step 6.2 encrypt secretKey and IV with client's public key
-        System.out.println(clientCert.getPublicKey().toString());
+        log("session key \n" + sessionKey.encodeKey());
 
-        String encryptedSessionKey = EncryptText.run(sessionKeyString, clientCert.getPublicKey());
-        String encryptedIV = EncryptText.run(ivString, clientCert.getPublicKey());
+        String encryptedSessionKey = AsymmetricCrypto.encrypt(sessionKey.encodeKey(), clientCert.getPublicKey());
+        String encryptedIV = AsymmetricCrypto.encrypt(iv.encodeIV(), clientCert.getPublicKey());
 
         //step 7 Server sends client session message
         HandshakeMessage sessionMsg = new HandshakeMessage();
@@ -172,7 +171,10 @@ public class ForwardServer
 
         sessionMsg.send(clientSocket);
 
-        clientSocket.close(); //end of handshake
+        clientSocket.close();
+        log("Handshake successful!");
+
+        //end of handshake
     }
 
     private void setUpSession() throws UnknownHostException, IOException, Exception {
@@ -205,8 +207,7 @@ public class ForwardServer
      * Prints given log message on the standart output if logging is enabled,
      * otherwise ignores it
      */
-    public void log(String aMessage)
-    {
+    public void log(String aMessage) {
         if (ENABLE_LOGGING)
            System.out.println(aMessage);
     }
@@ -222,5 +223,4 @@ public class ForwardServer
         System.err.println(indent + "--cacert=<filename>");
         System.err.println(indent + "--key=<filename>");                
     }
-
 }

@@ -14,22 +14,18 @@ package client; /**
  */
 
 
-import communication.handshake.HandleCertificate;
-import communication.handshake.Handshake;
-import communication.handshake.HandshakeMessage;
-import communication.handshake.aCertificate;
-import meta.Arguments;
+import communication.handshake.*;
+import communication.session.SessionKey;
 import communication.threads.ForwardServerClientThread;
+import meta.Arguments;
 import meta.Common;
-import meta.Logger;
 
-import java.lang.IllegalArgumentException;
-import java.lang.Integer;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.io.IOException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 public class ForwardClient {
@@ -43,7 +39,7 @@ public class ForwardClient {
     private static String serverHost;
 
     /**
-     * Program entry point. Reads arguments and run
+     * Program entry point. Reads arguments and encrypt
      * the forward server
      */
     public static void main(String[] args) {
@@ -72,7 +68,7 @@ public class ForwardClient {
 
     private static void doHandshake() throws Exception {
         /* Connect to forward server server */
-        System.out.println("Connect to " +  arguments.get("handshakehost") + ":" + Integer.parseInt(arguments.get("handshakeport")));
+        System.out.println("Connecting to " +  arguments.get("handshakehost") + ":" + Integer.parseInt(arguments.get("handshakeport")));
         Socket socket = new Socket(arguments.get("handshakehost"), Integer.parseInt(arguments.get("handshakeport")));
 
         /* This is where the handshake should take place */
@@ -107,7 +103,7 @@ public class ForwardClient {
             socket.close();
             throw new Error();
         } else {
-            Logger.log("Successful verification of server cert");
+           // Logger.log("Successful verification of server certificate...");
         }
 
         //step 5 client requests connection to target
@@ -117,7 +113,6 @@ public class ForwardClient {
         forwardMessage.putParameter(Common.TARGET_PORT, arguments.get("targetport"));
 
         forwardMessage.send(socket);
-        Logger.log("Sent forward message...");
 
         //step 8 receive session information from server
         HandshakeMessage sessionMessage = new HandshakeMessage();
@@ -129,12 +124,25 @@ public class ForwardClient {
             throw new Error();
         }
 
+        //decrypt session message to get session key and iv
+        PrivateKey clientPrivKey = AsymmetricCrypto.getPrivateKeyFromKeyFile(Common.CLIENT_PRIV_KEY_PATH);
+
+        String sessionKeyDecrypted = AsymmetricCrypto.decrypt(sessionMessage.getParameter(Common.SESSION_KEY), clientPrivKey);
+        String sessionIVDecrypted = AsymmetricCrypto.decrypt(sessionMessage.getParameter(Common.SESSION_IV), clientPrivKey);
+
+        SessionKey sessionKey = new SessionKey(sessionKeyDecrypted);
+
+        log(sessionKey.encodeKey());
+
+        //need to do shit here
+        log("Handshake successful!");
+
         socket.close();
     }
 
     private static void setUpSession() {
         /*
-         * Fake the communication.asdf.handshake result with static parameters.
+         * Fake the handshake result with static parameters.
          */
 
         /* This is to where the client.ForwardClient should connect.
@@ -158,7 +166,7 @@ public class ForwardClient {
 
     /*
      * Set up client forwarder.
-     * Run communication.asdf.handshake negotiation, then set up a listening socket and wait for user.
+     * Run handshake negotiation, then set up a listening socket and wait for user.
      * When user has connected, start port forwarder thread.
      */
     static public void startForwardClient() throws Exception {
@@ -185,7 +193,6 @@ public class ForwardClient {
 
             forwardThread = new ForwardServerClientThread(clientSocket, serverHost, serverPort);
             forwardThread.start();
-
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
@@ -194,7 +201,7 @@ public class ForwardClient {
     }
 
     /**
-     * Prints given log message on the standart output if logging is enabled,
+     * Prints given log message on the standard output if logging is enabled,
      * otherwise ignores it
      */
     public static void log(String aMessage)

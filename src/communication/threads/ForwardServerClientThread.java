@@ -38,7 +38,7 @@ public class ForwardServerClientThread extends Thread
     /**
      * Creates a client thread for handling clients of NakovForwardServer.
      * A client socket should be connected and passed to this constructor.
-     * A server socket is created later by run() method.
+     * A server socket is created later by encrypt() method.
      */
     public ForwardServerClientThread(Socket aClientSocket, String serverhost, int serverport)
     {
@@ -50,7 +50,7 @@ public class ForwardServerClientThread extends Thread
     /**
      * Creates a client thread for handling clients of NakovForwardServer.
      * Wait for client to connect on client listening socket.
-     * A server socket is created later by run() method.
+     * A server socket is created later by encrypt() method.
      */
     public ForwardServerClientThread(ServerSocket listensocket, String serverhost, int serverport) throws IOException
     {
